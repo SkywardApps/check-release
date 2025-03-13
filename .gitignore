@@ -1,0 +1,5 @@
+publish/
+obj/
+bin/
+check_release_dist/
+.vs/

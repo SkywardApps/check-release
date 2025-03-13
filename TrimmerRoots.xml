@@ -1,0 +1,5 @@
+<linker>
+  <assembly fullname="CheckRelease">
+    <type fullname="CheckRelease.AppSettings" preserve="all" />
+  </assembly>
+</linker>
