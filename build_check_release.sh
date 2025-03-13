@@ -14,12 +14,12 @@ DIST_DIR="check_release_dist"
 
 # Define target platforms
 ALL_PLATFORMS=(
-  "win-x64:check_release.exe"
-  "win-arm64:check_release.exe"
-  "linux-x64:check_release"
-  "linux-arm64:check_release"
-  "osx-x64:check_release"
-  "osx-arm64:check_release"
+  "win-x64:check_release.win-x64.exe"
+  "win-arm64:check_release.win-arm64.exe"
+  "linux-x64:check_release.linux-x64"
+  "linux-arm64:check_release.linux-arm64"
+  "osx-x64:check_release.osx-x64"
+  "osx-arm64:check_release.osx-arm64"
 )
 
 # Function to run tests

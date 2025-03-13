@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'release/v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for tags and branches
+      
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=$(echo ${GITHUB_REF#refs/tags/release/v})" >> $GITHUB_OUTPUT
+      
+      - name: Update version in project file
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          sed -i "s/<Version>.*<\/Version>/<Version>$VERSION<\/Version>/g" CheckRelease.csproj
+          # If Version tag doesn't exist, add it
+          if ! grep -q "<Version>" CheckRelease.csproj; then
+            sed -i "/<PropertyGroup>/a \    <Version>$VERSION<\/Version>" CheckRelease.csproj
+          fi
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      
+      - name: Fix line endings and build release
+        run: |
+          sed -i 's/\r$//' ./build_check_release.sh
+          chmod +x ./build_check_release.sh
+          ./build_check_release.sh
+      
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release v${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            check_release_dist/win-x64/check_release.win-x64.exe
+            check_release_dist/win-arm64/check_release.win-arm64.exe
+            check_release_dist/linux-x64/check_release.linux-x64
+            check_release_dist/linux-arm64/check_release.linux-arm64
+            check_release_dist/osx-x64/check_release.osx-x64
+            check_release_dist/osx-arm64/check_release.osx-arm64
+          generate_release_notes: true

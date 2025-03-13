@@ -3,6 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)](https://dotnet.microsoft.com/download/dotnet/9.0)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue)](https://github.com/SkywardApps/check-release/releases)
+[![Build Status](https://github.com/SkywardApps/check-release/actions/workflows/build.yml/badge.svg)](https://github.com/SkywardApps/check-release/actions/workflows/build.yml)
+[![Release Status](https://github.com/SkywardApps/check-release/actions/workflows/release.yml/badge.svg)](https://github.com/SkywardApps/check-release/actions/workflows/release.yml)
 
 A C# tool for analyzing and displaying changes between Git tags with JIRA ticket extraction and Slack unfurling support.
 

@@ -69,7 +69,28 @@ We welcome suggestions for new features or improvements:
 - Update documentation as needed
 - Add a clear description of your changes
 
-## Versioning Guidelines
+### Continuous Integration
+
+All pull requests are automatically built and tested using GitHub Actions. The following checks will run:
+
+1. **Build and Test**: Runs the `build_check_release.sh` script to:
+   - Execute all tests
+   - Build the application for all supported architectures
+   - Ensure everything compiles correctly
+
+Pull requests cannot be merged until all checks pass. This helps maintain code quality and ensures that changes don't break existing functionality.
+
+### Branch Protection
+
+The main branch is protected with the following rules:
+
+1. Pull requests must be reviewed and approved before merging
+2. The "Build and Test" workflow must pass before merging
+3. Direct pushes to the main branch are not allowed
+
+These protections help ensure that only high-quality, tested code is merged into the main branch.
+
+## Versioning and Release Guidelines
 
 This project follows [Semantic Versioning (SEMVER)](https://semver.org/). When contributing, please indicate the type of change:
 
@@ -87,6 +108,8 @@ This project follows [Semantic Versioning (SEMVER)](https://semver.org/). When c
 - Bug fixes and refinements that don't change functionality
 - Performance improvements
 - Documentation updates
+
+For detailed information about the release process, please see [RELEASING.md](docs/RELEASING.md).
 
 ## Coding Standards
 

@@ -3,3 +3,4 @@ obj/
 bin/
 check_release_dist/
 .vs/
+memory-bank/
