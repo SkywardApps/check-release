@@ -243,7 +243,15 @@ namespace CheckRelease.Adapters
             try
             {
                 var commit = _repository.Lookup<Commit>(reference);
-                if (commit == null) return null;
+                if (commit == null)
+                {
+                    var tag = GetTag(reference);
+                    if (tag == null || String.IsNullOrWhiteSpace(tag.TargetCommitSha))
+                    {
+                        return null;
+                    }
+                    commit = _repository.Lookup<Commit>(tag.TargetCommitSha);
+                }
                 
                 var tree = commit.Tree;
                 var treeEntry = tree[filePath];
