@@ -347,5 +347,211 @@ namespace CheckRelease.Tests
             Assert.False(isValid);
             Assert.Contains(console.ErrorOutput, msg => msg.Contains("Too many arguments"));
         }
+        
+        #region --from-common-ancestor Tests
+        
+        [Fact]
+        public void Parse_FromCommonAncestorWithSingleArg_ReturnsParsedArgs()
+        {
+            // Arrange
+            var config = CreateMockConfiguration(new Dictionary<string, string>
+            {
+                { "Prefix", "JIRA" },
+                { "SpanDays", "42" },
+                { "SettingsPath", "" }
+            });
+            
+            var console = new MockConsoleOutput();
+            var parser = new CommandLineParser(config, console);
+            string[] args = new[] { "--from-common-ancestor", "release/S106.06/production" };
+            
+            // Act
+            var result = parser.Parse(args);
+            
+            // Assert
+            Assert.Single(result.Arguments);
+            Assert.Equal("release/S106.06/production", result.Arguments[0]);
+            Assert.True(result.FromCommonAncestor);
+            Assert.False(result.HtmlOutput);
+            Assert.False(result.SettingsDiff);
+            Assert.Equal(string.Empty, result.SettingsPath);
+            Assert.False(result.DebugMode);
+            Assert.Equal(42, result.SpanDays);
+            Assert.Equal("JIRA", result.Prefix);
+        }
+        
+        [Fact]
+        public void Parse_FromCommonAncestorWithTwoArgs_ReturnsParsedArgs()
+        {
+            // Arrange
+            var config = CreateMockConfiguration(new Dictionary<string, string>
+            {
+                { "Prefix", "JIRA" },
+                { "SpanDays", "42" },
+                { "SettingsPath", "" }
+            });
+            
+            var console = new MockConsoleOutput();
+            var parser = new CommandLineParser(config, console);
+            string[] args = new[] { "--from-common-ancestor", "tag1", "tag2" };
+            
+            // Act
+            var result = parser.Parse(args);
+            
+            // Assert
+            Assert.Equal(2, result.Arguments.Count);
+            Assert.Equal("tag1", result.Arguments[0]);
+            Assert.Equal("tag2", result.Arguments[1]);
+            Assert.True(result.FromCommonAncestor);
+            Assert.False(result.HtmlOutput);
+            Assert.False(result.SettingsDiff);
+            Assert.Equal(string.Empty, result.SettingsPath);
+            Assert.False(result.DebugMode);
+            Assert.Equal(42, result.SpanDays);
+            Assert.Equal("JIRA", result.Prefix);
+        }
+        
+        [Fact]
+        public void Parse_FromCommonAncestorWithAllOptions_ReturnsParsedArgs()
+        {
+            // Arrange
+            var config = CreateMockConfiguration(new Dictionary<string, string>
+            {
+                { "Prefix", "JIRA" },
+                { "SpanDays", "42" },
+                { "SettingsPath", "" }
+            });
+            
+            var console = new MockConsoleOutput();
+            var parser = new CommandLineParser(config, console);
+            string[] args = new[] 
+            { 
+                "--html", 
+                "--settings-diff=eluminate-coredata-api/appsettings.json", 
+                "--prefix", "ELUM", 
+                "--jira-base-url", "https://digitial-product-engineering.atlassian.net/browse/",
+                "--debug", 
+                "--from-common-ancestor", 
+                "release/S106.06/production" 
+            };
+            
+            // Act
+            var result = parser.Parse(args);
+            
+            // Assert
+            Assert.Single(result.Arguments);
+            Assert.Equal("release/S106.06/production", result.Arguments[0]);
+            Assert.True(result.FromCommonAncestor);
+            Assert.True(result.HtmlOutput);
+            Assert.True(result.SettingsDiff);
+            Assert.Equal("eluminate-coredata-api/appsettings.json", result.SettingsPath);
+            Assert.True(result.DebugMode);
+            Assert.Equal("ELUM", result.Prefix);
+            Assert.Equal("https://digitial-product-engineering.atlassian.net/browse/", result.JiraBaseUrl);
+        }
+        
+        [Fact]
+        public void Validate_FromCommonAncestorWithSingleArg_ReturnsTrue()
+        {
+            // Arrange
+            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var console = new MockConsoleOutput();
+            var parser = new CommandLineParser(config, console);
+            var options = new CommandLineParser.CommandLineOptions
+            {
+                FromCommonAncestor = true,
+                Arguments = new List<string> { "release/S106.06/production" }
+            };
+            
+            // Act
+            bool isValid = parser.Validate(options);
+            
+            // Assert
+            Assert.True(isValid);
+        }
+        
+        [Fact]
+        public void Validate_FromCommonAncestorWithTwoArgs_ReturnsTrue()
+        {
+            // Arrange
+            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var console = new MockConsoleOutput();
+            var parser = new CommandLineParser(config, console);
+            var options = new CommandLineParser.CommandLineOptions
+            {
+                FromCommonAncestor = true,
+                Arguments = new List<string> { "tag1", "tag2" }
+            };
+            
+            // Act
+            bool isValid = parser.Validate(options);
+            
+            // Assert
+            Assert.True(isValid);
+        }
+        
+        [Fact]
+        public void Validate_FromCommonAncestorWithNoArgs_ReturnsFalse()
+        {
+            // Arrange
+            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var console = new MockConsoleOutput();
+            var parser = new CommandLineParser(config, console);
+            var options = new CommandLineParser.CommandLineOptions
+            {
+                FromCommonAncestor = true,
+                Arguments = new List<string>()
+            };
+            
+            // Act
+            bool isValid = parser.Validate(options);
+            
+            // Assert
+            Assert.False(isValid);
+            Assert.Contains(console.ErrorOutput, msg => msg.Contains("--from-common-ancestor requires 1-2 arguments"));
+        }
+        
+        [Fact]
+        public void Validate_FromCommonAncestorWithThreeArgs_ReturnsFalse()
+        {
+            // Arrange
+            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var console = new MockConsoleOutput();
+            var parser = new CommandLineParser(config, console);
+            var options = new CommandLineParser.CommandLineOptions
+            {
+                FromCommonAncestor = true,
+                Arguments = new List<string> { "tag1", "tag2", "tag3" }
+            };
+            
+            // Act
+            bool isValid = parser.Validate(options);
+            
+            // Assert
+            Assert.False(isValid);
+            Assert.Contains(console.ErrorOutput, msg => msg.Contains("--from-common-ancestor accepts at most 2 arguments"));
+        }
+        
+        [Fact]
+        public void Validate_FromCommonAncestorFalse_UsesStandardValidation()
+        {
+            // Arrange
+            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var console = new MockConsoleOutput();
+            var parser = new CommandLineParser(config, console);
+            var options = new CommandLineParser.CommandLineOptions
+            {
+                FromCommonAncestor = false,
+                Arguments = new List<string> { "release-1.0.0-production", "release-2.0.0-production" }
+            };
+            
+            // Act
+            bool isValid = parser.Validate(options);
+            
+            // Assert
+            Assert.True(isValid);
+        }
+        
+        #endregion
     }
 }

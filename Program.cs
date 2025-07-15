@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -88,8 +88,71 @@ namespace CheckRelease
                     
                     try
                     {
+                        // Check if we're using --from-common-ancestor option
+                        if (options.FromCommonAncestor)
+                        {
+                            if (options.DebugMode)
+                            {
+                                console.WriteDebug($"Using --from-common-ancestor mode with {options.Arguments.Count} argument(s)");
+                            }
+                            
+                            // Get commits for common ancestor mode
+                            (string commitA, string commitB) commitPair;
+                            
+                            if (options.Arguments.Count == 1)
+                            {
+                                // Single argument: compare HEAD to common ancestor with the specified reference
+                                commitPair = tagSelector.SelectHeadToCommonAncestor(options.Arguments[0]);
+                            }
+                            else
+                            {
+                                // Two arguments: compare first argument to common ancestor with second argument
+                                commitPair = tagSelector.SelectReferencesToCommonAncestor(options.Arguments[0], options.Arguments[1]);
+                            }
+                            
+                            var (commitA, commitB) = commitPair;
+                            
+                            // Process the commit pair
+                            var commitAnalyzer = new CommitAnalyzer(gitRepo, options.Prefix, options.DebugMode, console);
+                            var commits = commitAnalyzer.AnalyzeCommits(commitA, commitB);
+                            var releaseDate = DateTime.Now; // Use current date for HEAD
+                            
+                            // Generate output
+                            var outputGenerator = new OutputGenerator(options.HtmlOutput, options.DebugMode, options.Prefix, options.JiraBaseUrl, console);
+                            string output = outputGenerator.GenerateOutput(commitA, commitB, releaseDate, commits);
+                            
+                            // Generate settings diff if requested
+                            if (options.SettingsDiff)
+                            {
+                                try
+                                {
+                                    if (options.DebugMode)
+                                    {
+                                        console.WriteDebug($"Generating settings diff for {commitA} -> {commitB}...");
+                                    }
+                                    
+                                    var settingsDiffGenerator = new SettingsDiffGenerator(gitRepo, options.DebugMode, options.SettingsPath, console);
+                                    string settingsDiff = settingsDiffGenerator.GenerateSettingsDiff(commitA, commitB, options.HtmlOutput);
+                                    
+                                    // Add settings diff to output
+                                    output += Environment.NewLine + Environment.NewLine + settingsDiff;
+                                }
+                                catch (Exception ex)
+                                {
+                                    console.WriteError($"Error generating settings diff: {ex.Message}");
+                                    if (options.DebugMode && ex.InnerException != null)
+                                    {
+                                        console.WriteError($"Inner Exception: {ex.InnerException.Message}");
+                                    }
+                                }
+                            }
+                            
+                            // Write output to console
+                            console.WriteLine(string.Empty);
+                            console.WriteLine(output);
+                        }
                         // Check if we're in auto or stream mode
-                        if (options.Arguments.Count >= 1 && options.Arguments[0] == "auto")
+                        else if (options.Arguments.Count >= 1 && options.Arguments[0] == "auto")
                         {
                             // Get the tag type
                             string tagType = options.Arguments.Count > 1 ? options.Arguments[1] : "production";

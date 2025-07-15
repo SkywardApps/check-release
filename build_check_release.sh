@@ -18,7 +18,7 @@ ALL_PLATFORMS=(
   "win-arm64:check_release.win-arm64.exe"
   "linux-x64:check_release.linux-x64"
   "linux-arm64:check_release.linux-arm64"
-  "osx-x64:check_release.osx-x64"
+  "osx-x64:check_release.osx-x64"  
   "osx-arm64:check_release.osx-arm64"
 )
 

@@ -78,5 +78,13 @@ namespace CheckRelease.Interfaces
         /// <param name="filePath">The path to the file.</param>
         /// <returns>The content of the file, or null if not found.</returns>
         string? GetFileContentAtReference(string reference, string filePath);
+        
+        /// <summary>
+        /// Gets the merge base (common ancestor) between two references.
+        /// </summary>
+        /// <param name="reference1">The first reference.</param>
+        /// <param name="reference2">The second reference.</param>
+        /// <returns>The merge base commit, or null if not found.</returns>
+        GitCommit? GetMergeBase(string reference1, string reference2);
     }
 }

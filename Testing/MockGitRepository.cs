@@ -169,6 +169,49 @@ namespace CheckRelease.Testing
         }
         
         /// <inheritdoc/>
+        public GitCommit? GetMergeBase(string reference1, string reference2)
+        {
+            var commit1 = LookupCommit(reference1);
+            var commit2 = LookupCommit(reference2);
+            
+            if (commit1 == null || commit2 == null)
+                return null;
+                
+            // For testing purposes, implement a simple merge base algorithm
+            var ancestors1 = new HashSet<string>();
+            var ancestors2 = new HashSet<string>();
+            
+            // Collect all ancestors for both commits
+            CollectAncestors(commit1.Sha, ancestors1);
+            CollectAncestors(commit2.Sha, ancestors2);
+            
+            // Find the first common ancestor (in a real implementation, this would be the most recent one)
+            var commonAncestors = ancestors1.Intersect(ancestors2).ToList();
+            
+            if (commonAncestors.Count == 0)
+                return null;
+                
+            // Return the first common ancestor (in a real implementation, we'd need to find the most recent one)
+            return _commits.GetValueOrDefault(commonAncestors.First());
+        }
+        
+        private void CollectAncestors(string sha, HashSet<string> ancestors)
+        {
+            if (ancestors.Contains(sha))
+                return;
+                
+            ancestors.Add(sha);
+            
+            if (_commitRelationships.TryGetValue(sha, out var parents))
+            {
+                foreach (var parent in parents)
+                {
+                    CollectAncestors(parent, ancestors);
+                }
+            }
+        }
+        
+        /// <inheritdoc/>
         public void Dispose() { }
     }
 }

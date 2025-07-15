@@ -610,6 +610,126 @@ namespace CheckRelease
         }
         
         /// <summary>
+        /// Selects HEAD and the common ancestor with a specified reference for comparison.
+        /// </summary>
+        /// <param name="targetReference">The target reference (tag, commit, or environment name) to find common ancestor with.</param>
+        /// <returns>A tuple containing the common ancestor and "HEAD".</returns>
+        public (string CommitA, string CommitB) SelectHeadToCommonAncestor(string targetReference)
+        {
+            if (_debugMode)
+            {
+                _console.WriteDebug($"Finding common ancestor between HEAD and {targetReference}");
+            }
+            
+            // Resolve environment name to actual tag if needed
+            string resolvedReference = ResolveReferenceToTag(targetReference);
+            
+            if (_debugMode && resolvedReference != targetReference)
+            {
+                _console.WriteDebug($"Resolved environment '{targetReference}' to tag '{resolvedReference}'");
+            }
+            
+            // Validate that the target reference exists
+            var targetCommit = _repository.LookupCommit(resolvedReference);
+            if (targetCommit == null)
+            {
+                throw new ArgumentException($"Error: Reference '{resolvedReference}' does not exist.");
+            }
+            
+            // Get HEAD commit
+            var headCommit = _repository.GetHeadCommit();
+            if (headCommit == null)
+            {
+                throw new InvalidOperationException("Error: Could not get HEAD commit.");
+            }
+            
+            // Check if HEAD and target are the same commit
+            if (headCommit.Sha == targetCommit.Sha)
+            {
+                throw new InvalidOperationException($"Error: HEAD and '{targetReference}' are the same commit.");
+            }
+            
+            // Find the merge base (common ancestor)
+            var mergeBase = _repository.GetMergeBase("HEAD", resolvedReference);
+            if (mergeBase == null)
+            {
+                throw new InvalidOperationException($"Error: No common ancestor found between HEAD and '{resolvedReference}'.");
+            }
+            
+            if (_debugMode)
+            {
+                _console.WriteDebug($"Common ancestor found: {mergeBase.Sha.Substring(0, 7)}");
+                _console.WriteDebug($"Comparison: {mergeBase.Sha.Substring(0, 7)} -> HEAD");
+            }
+            
+            // Return the merge base as the older commit and HEAD as the newer commit
+            return (mergeBase.Sha, "HEAD");
+        }
+        
+        /// <summary>
+        /// Selects the common ancestor between two references and returns it with the first reference.
+        /// </summary>
+        /// <param name="reference1">The first reference (tag, commit, or environment name).</param>
+        /// <param name="reference2">The second reference (tag, commit, or environment name) to find common ancestor with.</param>
+        /// <returns>A tuple containing the common ancestor and the first reference.</returns>
+        public (string CommitA, string CommitB) SelectReferencesToCommonAncestor(string reference1, string reference2)
+        {
+            if (_debugMode)
+            {
+                _console.WriteDebug($"Finding common ancestor between {reference1} and {reference2}");
+            }
+            
+            // Resolve environment names to actual tags if needed
+            string resolvedReference1 = ResolveReferenceToTag(reference1);
+            string resolvedReference2 = ResolveReferenceToTag(reference2);
+            
+            if (_debugMode && resolvedReference1 != reference1)
+            {
+                _console.WriteDebug($"Resolved environment '{reference1}' to tag '{resolvedReference1}'");
+            }
+            
+            if (_debugMode && resolvedReference2 != reference2)
+            {
+                _console.WriteDebug($"Resolved environment '{reference2}' to tag '{resolvedReference2}'");
+            }
+            
+            // Validate that both references exist
+            var commit1 = _repository.LookupCommit(resolvedReference1);
+            if (commit1 == null)
+            {
+                throw new ArgumentException($"Error: Reference '{resolvedReference1}' does not exist.");
+            }
+            
+            var commit2 = _repository.LookupCommit(resolvedReference2);
+            if (commit2 == null)
+            {
+                throw new ArgumentException($"Error: Reference '{resolvedReference2}' does not exist.");
+            }
+            
+            // Check if both references are the same commit
+            if (commit1.Sha == commit2.Sha)
+            {
+                throw new InvalidOperationException($"Error: '{resolvedReference1}' and '{resolvedReference2}' are the same commit.");
+            }
+            
+            // Find the merge base (common ancestor)
+            var mergeBase = _repository.GetMergeBase(resolvedReference1, resolvedReference2);
+            if (mergeBase == null)
+            {
+                throw new InvalidOperationException($"Error: No common ancestor found between '{resolvedReference1}' and '{resolvedReference2}'.");
+            }
+            
+            if (_debugMode)
+            {
+                _console.WriteDebug($"Common ancestor found: {mergeBase.Sha.Substring(0, 7)}");
+                _console.WriteDebug($"Comparison: {mergeBase.Sha.Substring(0, 7)} -> {resolvedReference1}");
+            }
+            
+            // Return the merge base as the older commit and the first reference as the newer commit
+            return (mergeBase.Sha, resolvedReference1);
+        }
+        
+        /// <summary>
         /// Gets the date of a tag.
         /// </summary>
         /// <param name="tagName">The tag name.</param>
@@ -623,6 +743,54 @@ namespace CheckRelease
             }
             
             return tag.CreatedAt;
+        }
+        
+        /// <summary>
+        /// Resolves a reference to a tag name. If the reference is an environment name,
+        /// it finds the most recent tag for that environment. Otherwise, returns the reference unchanged.
+        /// </summary>
+        /// <param name="reference">The reference to resolve (tag name, commit SHA, or environment name).</param>
+        /// <returns>The resolved tag name or the original reference if not an environment name.</returns>
+        private string ResolveReferenceToTag(string reference)
+        {
+            // Check if the reference is a valid environment name
+            if (IsValidEnvironment(reference))
+            {
+                if (_debugMode)
+                {
+                    _console.WriteDebug($"Reference '{reference}' is an environment name, finding most recent tag");
+                }
+                
+                // Find the most recent tag for this environment
+                var recentTags = FindRecentTags(reference, 42); // Look back 42 days (6 weeks)
+                
+                if (recentTags.Count == 0)
+                {
+                    throw new InvalidOperationException($"No '{reference}' tags found in the last 42 days.");
+                }
+                
+                string mostRecentTag = recentTags[0];
+                
+                if (_debugMode)
+                {
+                    _console.WriteDebug($"Found most recent '{reference}' tag: {mostRecentTag}");
+                }
+                
+                return mostRecentTag;
+            }
+            
+            // Not an environment name, return as-is
+            return reference;
+        }
+        
+        /// <summary>
+        /// Checks if a reference is a valid environment name.
+        /// </summary>
+        /// <param name="reference">The reference to check.</param>
+        /// <returns>True if the reference is a valid environment name, false otherwise.</returns>
+        private bool IsValidEnvironment(string reference)
+        {
+            return ValidTypes.Contains(reference);
         }
     }
 }

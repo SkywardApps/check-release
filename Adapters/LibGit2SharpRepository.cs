@@ -272,6 +272,56 @@ namespace CheckRelease.Adapters
             }
         }
         
+        /// <inheritdoc/>
+        public GitCommit? GetMergeBase(string reference1, string reference2)
+        {
+            try
+            {
+                if (_debugMode)
+                {
+                    _console.WriteDebug($"Finding merge base between: {reference1} and {reference2}");
+                }
+                
+                var commit1 = _repository.Lookup<Commit>(reference1);
+                var commit2 = _repository.Lookup<Commit>(reference2);
+                
+                if (commit1 == null || commit2 == null)
+                {
+                    if (_debugMode)
+                    {
+                        _console.WriteDebug($"Could not find commits for {reference1} or {reference2}");
+                    }
+                    return null;
+                }
+                
+                var mergeBase = _repository.ObjectDatabase.FindMergeBase(commit1, commit2);
+                
+                if (mergeBase == null)
+                {
+                    if (_debugMode)
+                    {
+                        _console.WriteDebug($"No merge base found between {reference1} and {reference2}");
+                    }
+                    return null;
+                }
+                
+                if (_debugMode)
+                {
+                    _console.WriteDebug($"Merge base found: {mergeBase.Sha.Substring(0, 7)}");
+                }
+                
+                return MapCommit(mergeBase);
+            }
+            catch (Exception ex)
+            {
+                if (_debugMode)
+                {
+                    _console.WriteError($"Error finding merge base between {reference1} and {reference2}: {ex.Message}");
+                }
+                return null;
+            }
+        }
+        
         /// <summary>
         /// Maps a LibGit2Sharp Commit to a GitCommit.
         /// </summary>

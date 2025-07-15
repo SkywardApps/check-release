@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "CheckRelease": {
+      "commandName": "Project",
+      "commandLineArgs": "--settings-diff=\"eluminate-coredata-api/appsettings.json\" \r\n--prefix=ELUM \r\n--jira-base-url=\"https://digitial-product-engineering.atlassian.net/browse/\" \r\n--html \r\nauto \"uat\" ",
+      "workingDirectory": "C:\\Users\\nelliott\\Documents\\Projects\\syngenta\\eluminate\\api-csharp-ghx-agronomics"
+    }
+  }
+}

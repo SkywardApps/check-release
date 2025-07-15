@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
@@ -45,6 +46,7 @@ namespace CheckRelease
             var spanOption = new Option<int>("--span", () => appSettings.SpanDays, $"Number of days to look back for tags");
             var prefixOption = new Option<string>("--prefix", () => appSettings.Prefix, $"Prefix for JIRA tickets in commit messages");
             var jiraBaseUrlOption = new Option<string>("--jira-base-url", () => appSettings.JiraBaseUrl, $"Base URL for JIRA tickets");
+            var fromCommonAncestorOption = new Option<bool>("--from-common-ancestor", "Compare to common ancestor with the specified tag(s) or commit(s)");
             
             _rootCommand.AddOption(htmlOption);
             _rootCommand.AddOption(settingsDiffOption);
@@ -53,6 +55,7 @@ namespace CheckRelease
             _rootCommand.AddOption(spanOption);
             _rootCommand.AddOption(prefixOption);
             _rootCommand.AddOption(jiraBaseUrlOption);
+            _rootCommand.AddOption(fromCommonAncestorOption);
             
             // Add argument for tags or commands
             var tagsArgument = new Argument<string[]>("tags", "Tags or commands to use")
@@ -62,24 +65,35 @@ namespace CheckRelease
             
             _rootCommand.AddArgument(tagsArgument);
             
-            // Set the handler
-            _rootCommand.SetHandler((bool html, string settingsDiffPath, bool debug, bool trace, int span, string prefix, string jiraBaseUrl, string[] args) =>
+            // Set the handler using a simpler approach since we hit the parameter limit
+            _rootCommand.SetHandler((context) =>
             {
+                var htmlOutput = context.ParseResult.GetValueForOption(htmlOption);
+                var settingsDiffPath = context.ParseResult.GetValueForOption(settingsDiffOption);
+                var debugMode = context.ParseResult.GetValueForOption(debugOption);
+                var traceMode = context.ParseResult.GetValueForOption(traceOption);
+                var spanDays = context.ParseResult.GetValueForOption(spanOption);
+                var prefix = context.ParseResult.GetValueForOption(prefixOption);
+                var jiraBaseUrl = context.ParseResult.GetValueForOption(jiraBaseUrlOption);
+                var fromCommonAncestor = context.ParseResult.GetValueForOption(fromCommonAncestorOption);
+                var arguments = context.ParseResult.GetValueForArgument(tagsArgument);
+                
                 var options = new CommandLineOptions
                 {
-                    HtmlOutput = html,
+                    HtmlOutput = htmlOutput,
                     SettingsDiff = !string.IsNullOrEmpty(settingsDiffPath),
-                    SettingsPath = settingsDiffPath,
-                    DebugMode = debug,
-                    TraceMode = trace,
-                    SpanDays = span,
-                    Prefix = prefix,
-                    JiraBaseUrl = jiraBaseUrl,
-                    Arguments = args.ToList()
+                    SettingsPath = settingsDiffPath ?? string.Empty,
+                    DebugMode = debugMode,
+                    TraceMode = traceMode,
+                    SpanDays = spanDays,
+                    Prefix = prefix ?? string.Empty,
+                    JiraBaseUrl = jiraBaseUrl ?? string.Empty,
+                    FromCommonAncestor = fromCommonAncestor,
+                    Arguments = arguments?.ToList() ?? new List<string>()
                 };
                 
                 ParseResult = options;
-            }, htmlOption, settingsDiffOption, debugOption, traceOption, spanOption, prefixOption, jiraBaseUrlOption, tagsArgument);
+            });
         }
         
         /// <summary>
@@ -105,6 +119,27 @@ namespace CheckRelease
         /// <returns>True if the options are valid, false otherwise.</returns>
         public bool Validate(CommandLineOptions options)
         {
+            // Check if using --from-common-ancestor option
+            if (options.FromCommonAncestor)
+            {
+                // When using --from-common-ancestor, require 1-2 arguments
+                if (options.Arguments.Count == 0)
+                {
+                    _console.WriteError("Error: --from-common-ancestor requires 1-2 arguments (tag or commit references).");
+                    ShowUsage();
+                    return false;
+                }
+                
+                if (options.Arguments.Count > 2)
+                {
+                    _console.WriteError("Error: --from-common-ancestor accepts at most 2 arguments.");
+                    ShowUsage();
+                    return false;
+                }
+                
+                return true;
+            }
+            
             if (options.Arguments.Count == 0)
             {
                 _console.WriteError("Error: No tags or commands specified.");
@@ -197,14 +232,25 @@ namespace CheckRelease
             _console.WriteLine("    - Finds all tags of the same type from the month prior to <tag>'s creation date.");
             _console.WriteLine("    - Shows them in a menu, user picks exactly one to pair with <tag>.");
             _console.WriteLine(string.Empty);
+            _console.WriteLine("  CheckRelease [--html] [--settings-diff=<path>] [--debug] --from-common-ancestor <tag-commit-or-env>");
+            _console.WriteLine("    - Compare HEAD to common ancestor with the specified tag, commit, or environment.");
+            _console.WriteLine("    - Environment names (production, uat, qa, dev) resolve to the most recent tag.");
+            _console.WriteLine("    - Analyzes all commits between HEAD and the nearest common ancestor.");
+            _console.WriteLine(string.Empty);
+            _console.WriteLine("  CheckRelease [--html] [--settings-diff=<path>] [--debug] --from-common-ancestor <ref1> <ref2>");
+            _console.WriteLine("    - Compare ref1 to common ancestor with ref2.");
+            _console.WriteLine("    - References can be tags, commits, or environment names.");
+            _console.WriteLine("    - Analyzes all commits between ref1 and the nearest common ancestor.");
+            _console.WriteLine(string.Empty);
             _console.WriteLine("Options:");
-            _console.WriteLine("  --html                   Generate HTML output instead of plain text");
-            _console.WriteLine($"  --settings-diff <path>   Include a diff of appsettings.json between tags and specify the path [default: {appSettings.SettingsPath}]");
-            _console.WriteLine("  --debug                  Enable debug mode with verbose output");
-            _console.WriteLine("  --trace                  Enable trace mode");
-            _console.WriteLine($"  --span <days>            Number of days to look back for tags [default: {appSettings.SpanDays} days]");
-            _console.WriteLine($"  --prefix <text>          Prefix for JIRA tickets in commit messages [default: {appSettings.Prefix}]");
-            _console.WriteLine($"  --jira-base-url <url>    Base URL for JIRA tickets [default: {appSettings.JiraBaseUrl}]");
+            _console.WriteLine("  --html                          Generate HTML output instead of plain text");
+            _console.WriteLine($"  --settings-diff <path>          Include a diff of appsettings.json between tags and specify the path [default: {appSettings.SettingsPath}]");
+            _console.WriteLine("  --debug                         Enable debug mode with verbose output");
+            _console.WriteLine("  --trace                         Enable trace mode");
+            _console.WriteLine($"  --span <days>                   Number of days to look back for tags [default: {appSettings.SpanDays} days]");
+            _console.WriteLine($"  --prefix <text>                 Prefix for JIRA tickets in commit messages [default: {appSettings.Prefix}]");
+            _console.WriteLine($"  --jira-base-url <url>           Base URL for JIRA tickets [default: {appSettings.JiraBaseUrl}]");
+            _console.WriteLine("  --from-common-ancestor <ref>   Compare HEAD to common ancestor with the specified tag or commit");
             _console.WriteLine(string.Empty);
             _console.WriteLine("Examples:");
             _console.WriteLine("  CheckRelease --html --settings-diff=\"project-dir/appsettings.json\" auto > releases.html");
@@ -212,6 +258,9 @@ namespace CheckRelease
             _console.WriteLine("  CheckRelease production --settings-diff");
             _console.WriteLine("  CheckRelease --settings-diff=\"project-dir/appsettings.json\" release-1.2.3-uat");
             _console.WriteLine("  CheckRelease --html --settings-diff=\"project-dir/appsettings.json\" release-1.2.3-uat release-1.2.4-uat");
+            _console.WriteLine("  CheckRelease --html --from-common-ancestor v1.2.0 > changes-since-v1.2.0.html");
+            _console.WriteLine("  CheckRelease --html --from-common-ancestor production > changes-since-production.html");
+            _console.WriteLine("  CheckRelease --from-common-ancestor uat production");
         }
         
         /// <summary>
@@ -258,6 +307,11 @@ namespace CheckRelease
             /// Gets or sets the base URL for JIRA tickets.
             /// </summary>
             public string JiraBaseUrl { get; set; } = string.Empty;
+            
+            /// <summary>
+            /// Gets or sets a value indicating whether to use common ancestor comparison.
+            /// </summary>
+            public bool FromCommonAncestor { get; set; }
             
             /// <summary>
             /// Gets or sets the non-option arguments (tags or commands).
