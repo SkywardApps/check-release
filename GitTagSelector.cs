@@ -559,7 +559,7 @@ namespace CheckRelease
             }
             
             // Get the HEAD commit
-            var head = _repository.GetHeadCommit();
+            var head = _repository.GetHeadGitCommit();
             if (head == null)
             {
                 throw new InvalidOperationException("Could not get HEAD commit");
@@ -630,14 +630,14 @@ namespace CheckRelease
             }
             
             // Validate that the target reference exists
-            var targetCommit = _repository.LookupCommit(resolvedReference);
+            var targetCommit = _repository.LookupGitCommit(resolvedReference);
             if (targetCommit == null)
             {
                 throw new ArgumentException($"Error: Reference '{resolvedReference}' does not exist.");
             }
             
             // Get HEAD commit
-            var headCommit = _repository.GetHeadCommit();
+            var headCommit = _repository.GetHeadGitCommit();
             if (headCommit == null)
             {
                 throw new InvalidOperationException("Error: Could not get HEAD commit.");
@@ -694,13 +694,13 @@ namespace CheckRelease
             }
             
             // Validate that both references exist
-            var commit1 = _repository.LookupCommit(resolvedReference1);
+            var commit1 = _repository.LookupGitCommit(resolvedReference1);
             if (commit1 == null)
             {
                 throw new ArgumentException($"Error: Reference '{resolvedReference1}' does not exist.");
             }
             
-            var commit2 = _repository.LookupCommit(resolvedReference2);
+            var commit2 = _repository.LookupGitCommit(resolvedReference2);
             if (commit2 == null)
             {
                 throw new ArgumentException($"Error: Reference '{resolvedReference2}' does not exist.");

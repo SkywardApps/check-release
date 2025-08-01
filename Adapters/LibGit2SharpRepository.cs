@@ -81,40 +81,56 @@ namespace CheckRelease.Adapters
         }
         
         /// <inheritdoc/>
-        public GitCommit? GetHeadCommit()
+        public GitCommit? GetHeadGitCommit()
         {
             var headCommit = _repository.Head.Tip;
             if (headCommit == null) return null;
             
             return MapCommit(headCommit);
         }
-        
+
+        public Commit? GetHeadCommit()
+        {
+            return _repository.Head.Tip;
+        }
+
         /// <inheritdoc/>
-        public GitCommit? LookupCommit(string shaOrRef)
+        public GitCommit? LookupGitCommit(string shaOrRef)
+        {
+            var value = LookupCommit(shaOrRef);
+            if (value != null)
+            {
+                return MapCommit(value);
+            }
+            return null;
+        }
+
+        private Commit? LookupCommit(string shaOrRef)
         {
             // Check if it's HEAD
             if (shaOrRef == "HEAD")
             {
                 return GetHeadCommit();
             }
-            
+
             // Try to look up as a commit
-            var commit = _repository.Lookup<Commit>(shaOrRef);
-            if (commit != null)
+            var value = _repository.Lookup<Commit>(shaOrRef);
+            if (value != null)
+
             {
-                return MapCommit(commit);
+                return value;
             }
-            
+
             // Try to look up as a tag
             var tag = _repository.Tags[shaOrRef];
             if (tag?.PeeledTarget is Commit tagCommit)
             {
-                return MapCommit(tagCommit);
+                return tagCommit;
             }
-            
+
             return null;
         }
-        
+
         /// <inheritdoc/>
         public IEnumerable<GitCommit> GetCommitsBetween(string olderRef, string newerRef)
         {
@@ -125,8 +141,8 @@ namespace CheckRelease.Adapters
                     _console.WriteDebug($"Getting commits between: {olderRef} -> {newerRef}");
                 }
                 
-                var olderCommit = _repository.Lookup<Commit>(olderRef);
-                var newerCommit = _repository.Lookup<Commit>(newerRef);
+                var olderCommit = LookupCommit(olderRef);
+                var newerCommit = LookupCommit(newerRef);
                 
                 if (olderCommit == null || newerCommit == null)
                 {
@@ -181,7 +197,7 @@ namespace CheckRelease.Adapters
         {
             try
             {
-                var commit = _repository.Lookup<Commit>(reference);
+                var commit = LookupCommit(reference);
                 if (commit == null)
                 {
                     return Enumerable.Empty<GitCommit>();
@@ -210,8 +226,8 @@ namespace CheckRelease.Adapters
         {
             try
             {
-                var includeCommit = _repository.Lookup<Commit>(includeReference);
-                var excludeCommit = _repository.Lookup<Commit>(excludeReference);
+                var includeCommit = LookupCommit(includeReference);
+                var excludeCommit = LookupCommit(excludeReference);
                 
                 if (includeCommit == null || excludeCommit == null)
                 {
@@ -242,7 +258,7 @@ namespace CheckRelease.Adapters
         {
             try
             {
-                var commit = _repository.Lookup<Commit>(reference);
+                var commit = LookupCommit(reference);
                 if (commit == null)
                 {
                     var tag = GetTag(reference);
@@ -250,7 +266,7 @@ namespace CheckRelease.Adapters
                     {
                         return null;
                     }
-                    commit = _repository.Lookup<Commit>(tag.TargetCommitSha);
+                    commit = LookupCommit(tag.TargetCommitSha);
                 }
                 
                 var tree = commit.Tree;
@@ -282,8 +298,8 @@ namespace CheckRelease.Adapters
                     _console.WriteDebug($"Finding merge base between: {reference1} and {reference2}");
                 }
                 
-                var commit1 = _repository.Lookup<Commit>(reference1);
-                var commit2 = _repository.Lookup<Commit>(reference2);
+                var commit1 = LookupCommit(reference1);
+                var commit2 = LookupCommit(reference2);
                 
                 if (commit1 == null || commit2 == null)
                 {
