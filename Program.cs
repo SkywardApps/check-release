@@ -437,7 +437,7 @@ namespace CheckRelease
         {
             if (tagName == "HEAD")
             {
-                var headCommit = repo.GetHeadCommit();
+                var headCommit = repo.GetHeadGitCommit();
                 if (headCommit != null)
                 {
                     return headCommit.AuthorWhen.DateTime;
@@ -445,7 +445,7 @@ namespace CheckRelease
                 return DateTime.Now;
             }
             
-            var commit = repo.LookupCommit(tagName);
+            var commit = repo.LookupGitCommit(tagName);
             if (commit != null)
             {
                 return commit.AuthorWhen.DateTime;

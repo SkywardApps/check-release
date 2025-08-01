@@ -96,10 +96,10 @@ namespace CheckRelease.Testing
         public bool TagExists(string tagName) => _tags.ContainsKey(tagName);
         
         /// <inheritdoc/>
-        public GitCommit? GetHeadCommit() => _headCommit;
+        public GitCommit? GetHeadGitCommit() => _headCommit;
         
         /// <inheritdoc/>
-        public GitCommit? LookupCommit(string shaOrRef)
+        public GitCommit? LookupGitCommit(string shaOrRef)
         {
             if (shaOrRef == "HEAD")
                 return _headCommit;
@@ -126,7 +126,7 @@ namespace CheckRelease.Testing
         {
             var result = new HashSet<string>();
             var visited = new HashSet<string>();
-            var commit = LookupCommit(reference);
+            var commit = LookupGitCommit(reference);
             
             if (commit == null)
                 return Enumerable.Empty<GitCommit>();
@@ -171,8 +171,8 @@ namespace CheckRelease.Testing
         /// <inheritdoc/>
         public GitCommit? GetMergeBase(string reference1, string reference2)
         {
-            var commit1 = LookupCommit(reference1);
-            var commit2 = LookupCommit(reference2);
+            var commit1 = LookupGitCommit(reference1);
+            var commit2 = LookupGitCommit(reference2);
             
             if (commit1 == null || commit2 == null)
                 return null;

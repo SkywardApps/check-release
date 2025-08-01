@@ -39,14 +39,14 @@ namespace CheckRelease.Interfaces
         /// Gets the HEAD commit.
         /// </summary>
         /// <returns>The HEAD commit, or null if not found.</returns>
-        GitCommit? GetHeadCommit();
+        GitCommit? GetHeadGitCommit();
         
         /// <summary>
         /// Looks up a commit by SHA or reference.
         /// </summary>
         /// <param name="shaOrRef">The SHA or reference to look up.</param>
         /// <returns>The commit, or null if not found.</returns>
-        GitCommit? LookupCommit(string shaOrRef);
+        GitCommit? LookupGitCommit(string shaOrRef);
         
         /// <summary>
         /// Gets commits between two references.
