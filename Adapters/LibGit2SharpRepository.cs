@@ -98,7 +98,7 @@ namespace CheckRelease.Adapters
         public GitCommit? LookupGitCommit(string shaOrRef)
         {
             var value = LookupCommit(shaOrRef);
-            if(value != null)
+            if (value != null)
             {
                 return MapCommit(value);
             }
