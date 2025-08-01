@@ -115,7 +115,8 @@ namespace CheckRelease.Adapters
 
             // Try to look up as a commit
             var value = _repository.Lookup<Commit>(shaOrRef);
-            if(value != null)
+            if (value != null)
+
             {
                 return value;
             }
