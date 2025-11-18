@@ -34,7 +34,10 @@ namespace CheckRelease
             _console = console ?? new Adapters.ConsoleOutput(debugMode);
             
             // Create the regex pattern with the configurable prefix
-            _jiraTicketRegex = new Regex($@"({_prefix}-[0-9]+)_+([A-Za-z0-9_]+)", RegexOptions.Compiled);
+            // This pattern supports both formats:
+            // 1. Simple: JIRA-123 (just the ticket ID)
+            // 2. With title: JIRA-123__Add_Feature (ticket ID followed by underscores and title)
+            _jiraTicketRegex = new Regex($@"({_prefix}-[0-9]+)(?:_+([A-Za-z0-9_]+))?", RegexOptions.Compiled);
         }
         
         /// <summary>
@@ -111,8 +114,12 @@ namespace CheckRelease
                         var jiraId = match.Groups[1].Value;
                         var extraText = match.Groups[2].Value;
                         
-                        // Format the extra text
-                        var formattedText = FormatExtraText(extraText);
+                        // Format the description:
+                        // If there's extra text (title), format it
+                        // If there's no extra text (simple branch name), use "Ticket {ID}"
+                        var formattedText = string.IsNullOrEmpty(extraText) 
+                            ? $"Ticket {jiraId}" 
+                            : FormatExtraText(extraText);
                         
                         // Skip if we've already processed this ticket
                         if (processedTickets.Contains(jiraId))
