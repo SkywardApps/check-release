@@ -8,6 +8,8 @@
 
 A C# tool for analyzing and displaying changes between Git tags with JIRA ticket extraction and Slack unfurling support.
 
+Created by [Nicholas Elliott](https://nicholasmtelliott.com) at Skyward App Company. Maintained by [@NicholasMTElliott](https://github.com/NicholasMTElliott).
+
 ## Overview
 
 Check Release is a command-line utility that analyzes commits between Git tags or specific commits, extracts JIRA tickets from commit messages, and outputs the results in plain text or HTML format. The HTML output includes meta tags for Slack unfurling, allowing changes to be visible directly in Slack without requiring users to click through to the page.
