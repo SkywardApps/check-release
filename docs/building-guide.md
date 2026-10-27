@@ -4,7 +4,7 @@ This guide provides detailed instructions for building Check Release from source
 
 ## Prerequisites
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (any 10.0.x; pinned by `global.json`)
 - Git (for cloning the repository)
 
 ## Building from Source
@@ -145,7 +145,7 @@ docker run --rm -v $(pwd):/repo check-release auto
 
 #### Missing .NET SDK
 
-If you get an error about missing .NET SDK, ensure you have installed .NET 9 SDK:
+If you get an error about missing .NET SDK, ensure you have installed .NET 10 SDK:
 
 ```bash
 dotnet --version

@@ -24,7 +24,7 @@ If applicable, add screenshots or command output to help explain your problem.
 ## Environment
  - OS: [e.g. Windows, macOS, Linux]
  - Version: [e.g. 1.0.0]
- - .NET Version: [e.g. 9.0]
+ - .NET Version: [e.g. 10.0]
 
 ## Additional context
 Add any other context about the problem here.

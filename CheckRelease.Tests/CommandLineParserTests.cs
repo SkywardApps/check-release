@@ -10,7 +10,7 @@ namespace CheckRelease.Tests
 {
     public class CommandLineParserTests
     {
-        private IConfiguration CreateMockConfiguration(Dictionary<string, string> settings)
+        private IConfiguration CreateMockConfiguration(Dictionary<string, string?> settings)
         {
             return new ConfigurationBuilder()
                 .AddInMemoryCollection(settings)
@@ -21,7 +21,7 @@ namespace CheckRelease.Tests
         public void Parse_DirectMode_ReturnsParsedArgs()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "Prefix", "JIRA" },
                 { "SpanDays", "42" },
@@ -51,7 +51,7 @@ namespace CheckRelease.Tests
         public void Parse_AutoMode_ReturnsParsedArgs()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "Prefix", "JIRA" },
                 { "SpanDays", "42" },
@@ -81,7 +81,7 @@ namespace CheckRelease.Tests
         public void Parse_StreamMode_ReturnsParsedArgs()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "Prefix", "JIRA" },
                 { "SpanDays", "42" },
@@ -110,7 +110,7 @@ namespace CheckRelease.Tests
         public void Parse_OptionalFlags_SetsCorrectProperties()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "Prefix", "JIRA" },
                 { "SpanDays", "42" },
@@ -149,7 +149,7 @@ namespace CheckRelease.Tests
         public void Parse_NoOptionalArgs_UsesDefaults()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "Prefix", "JIRA" },
                 { "SpanDays", "42" },
@@ -177,7 +177,7 @@ namespace CheckRelease.Tests
         public void Validate_DirectMode_ReturnsTrue()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -196,7 +196,7 @@ namespace CheckRelease.Tests
         public void Validate_AutoMode_ReturnsTrue()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -215,7 +215,7 @@ namespace CheckRelease.Tests
         public void Validate_StreamMode_ReturnsTrue()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -234,7 +234,7 @@ namespace CheckRelease.Tests
         public void Validate_TypeMode_ReturnsTrue()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -253,7 +253,7 @@ namespace CheckRelease.Tests
         public void Validate_SingleTagMode_ReturnsTrue()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -272,7 +272,7 @@ namespace CheckRelease.Tests
         public void Validate_NoArguments_ReturnsFalse()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -292,7 +292,7 @@ namespace CheckRelease.Tests
         public void Validate_InvalidSingleArgument_ReturnsFalse()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -312,7 +312,7 @@ namespace CheckRelease.Tests
         public void Validate_InvalidAutoModeType_ReturnsFalse()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -332,7 +332,7 @@ namespace CheckRelease.Tests
         public void Validate_TooManyArguments_ReturnsFalse()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -354,7 +354,7 @@ namespace CheckRelease.Tests
         public void Parse_FromCommonAncestorWithSingleArg_ReturnsParsedArgs()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "Prefix", "JIRA" },
                 { "SpanDays", "42" },
@@ -384,7 +384,7 @@ namespace CheckRelease.Tests
         public void Parse_FromCommonAncestorWithTwoArgs_ReturnsParsedArgs()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "Prefix", "JIRA" },
                 { "SpanDays", "42" },
@@ -415,7 +415,7 @@ namespace CheckRelease.Tests
         public void Parse_FromCommonAncestorWithAllOptions_ReturnsParsedArgs()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "Prefix", "JIRA" },
                 { "SpanDays", "42" },
@@ -454,7 +454,7 @@ namespace CheckRelease.Tests
         public void Validate_FromCommonAncestorWithSingleArg_ReturnsTrue()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -474,7 +474,7 @@ namespace CheckRelease.Tests
         public void Validate_FromCommonAncestorWithTwoArgs_ReturnsTrue()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -494,7 +494,7 @@ namespace CheckRelease.Tests
         public void Validate_FromCommonAncestorWithNoArgs_ReturnsFalse()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -515,7 +515,7 @@ namespace CheckRelease.Tests
         public void Validate_FromCommonAncestorWithThreeArgs_ReturnsFalse()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
@@ -536,7 +536,7 @@ namespace CheckRelease.Tests
         public void Validate_FromCommonAncestorFalse_UsesStandardValidation()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             var console = new MockConsoleOutput();
             var parser = new CommandLineParser(config, console);
             var options = new CommandLineParser.CommandLineOptions
