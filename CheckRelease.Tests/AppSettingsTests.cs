@@ -9,7 +9,7 @@ namespace CheckRelease.Tests
 {
     public class AppSettingsTests
     {
-        private IConfiguration CreateMockConfiguration(Dictionary<string, string> settings)
+        private IConfiguration CreateMockConfiguration(Dictionary<string, string?> settings)
         {
             return new ConfigurationBuilder()
                 .AddInMemoryCollection(settings)
@@ -33,7 +33,7 @@ namespace CheckRelease.Tests
         public void AppSettings_FromConfiguration_LoadsValues()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "SpanDays", "30" },
                 { "Prefix", "CUSTOM" },
@@ -56,7 +56,7 @@ namespace CheckRelease.Tests
         public void AppSettings_WithPartialConfiguration_UsesMixOfDefaultsAndConfigValues()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "SpanDays", "30" },
                 { "Prefix", "CUSTOM" }
@@ -78,7 +78,7 @@ namespace CheckRelease.Tests
         public void AppSettings_WithInvalidValues_ThrowsException()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>
+            var config = CreateMockConfiguration(new Dictionary<string, string?>
             {
                 { "SpanDays", "invalid" } // Not a valid integer
             });
@@ -96,7 +96,7 @@ namespace CheckRelease.Tests
         public void AppSettings_CommandLineOverridesConfiguration()
         {
             // Arrange
-            var configSettings = new Dictionary<string, string>
+            var configSettings = new Dictionary<string, string?>
             {
                 { "SpanDays", "30" },
                 { "Prefix", "CONFIG" },
@@ -135,7 +135,7 @@ namespace CheckRelease.Tests
         public void AppSettings_WithEmptyConfiguration_UsesDefaults()
         {
             // Arrange
-            var config = CreateMockConfiguration(new Dictionary<string, string>());
+            var config = CreateMockConfiguration(new Dictionary<string, string?>());
             
             // Act
             var settings = new AppSettings();

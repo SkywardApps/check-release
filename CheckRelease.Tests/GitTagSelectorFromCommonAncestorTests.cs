@@ -651,7 +651,7 @@ namespace CheckRelease.Tests
             // Act - We need to use reflection since IsValidEnvironment is private
             var method = typeof(GitTagSelector).GetMethod("IsValidEnvironment", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var result = (bool)method.Invoke(tagSelector, new object[] { environmentName });
+            var result = (bool)method!.Invoke(tagSelector, new object[] { environmentName })!;
             
             // Assert
             Assert.True(result);
@@ -672,7 +672,7 @@ namespace CheckRelease.Tests
             // Act - We need to use reflection since IsValidEnvironment is private
             var method = typeof(GitTagSelector).GetMethod("IsValidEnvironment", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var result = (bool)method.Invoke(tagSelector, new object[] { environmentName });
+            var result = (bool)method!.Invoke(tagSelector, new object[] { environmentName })!;
             
             // Assert
             Assert.False(result);
@@ -708,7 +708,7 @@ namespace CheckRelease.Tests
             // Act - We need to use reflection since ResolveReferenceToTag is private
             var method = typeof(GitTagSelector).GetMethod("ResolveReferenceToTag", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var result = (string)method.Invoke(tagSelector, new object[] { "production" });
+            var result = (string)method!.Invoke(tagSelector, new object[] { "production" })!;
             
             // Assert
             Assert.Equal("v1.0.0-production", result);
@@ -725,7 +725,7 @@ namespace CheckRelease.Tests
             // Act - We need to use reflection since ResolveReferenceToTag is private
             var method = typeof(GitTagSelector).GetMethod("ResolveReferenceToTag", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var result = (string)method.Invoke(tagSelector, new object[] { "v1.0.0" });
+            var result = (string)method!.Invoke(tagSelector, new object[] { "v1.0.0" })!;
             
             // Assert
             Assert.Equal("v1.0.0", result);

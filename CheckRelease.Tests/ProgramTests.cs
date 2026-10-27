@@ -131,7 +131,7 @@ namespace CheckRelease.Tests
             var console = new MockConsoleOutput();
             
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
+                .AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     { "JiraBaseUrl", defaultJiraBaseUrl }
                 })
