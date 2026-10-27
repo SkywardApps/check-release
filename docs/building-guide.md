@@ -4,7 +4,7 @@ This guide provides detailed instructions for building Check Release from source
 
 ## Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later (pinned by `global.json`)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (any 10.0.x; pinned by `global.json`)
 - Git (for cloning the repository)
 
 ## Building from Source
