@@ -5,11 +5,16 @@ on:
     tags:
       - 'release/v*.*.*'
 
+permissions:
+  contents: read
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # create the GitHub release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Fetch all history for tags and branches
       
@@ -27,9 +32,9 @@ jobs:
           fi
       
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '9.0.x'
+          global-json-file: global.json
       
       - name: Fix line endings and build release
         run: |
@@ -39,7 +44,7 @@ jobs:
       
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           name: Release v${{ steps.get_version.outputs.VERSION }}
           draft: false

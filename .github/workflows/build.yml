@@ -4,20 +4,28 @@ on:
   push:
     branches: [ '**' ]
   pull_request:
-    branches: [ main ]
+    branches: [ mainline ]
+
+permissions:
+  contents: read
+
+# Cancel superseded runs for the same pull request; push runs get a unique group.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Fetch all history for tags and branches
       
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '9.0.x'
+          global-json-file: global.json
       
       - name: Fix line endings and run build script
         run: |
@@ -26,7 +34,7 @@ jobs:
           ./build_check_release.sh
       
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: check-release-builds
           path: check_release_dist/
