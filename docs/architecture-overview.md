@@ -147,9 +147,9 @@ The application is designed with testability in mind:
 
 ## Key Technical Decisions
 
-### C# and .NET 9
+### C# and .NET 10
 
-The application is implemented in C# using .NET 9, providing:
+The application is implemented in C# using .NET 10, providing:
 
 - Modern, type-safe development environment
 - Cross-platform compatibility

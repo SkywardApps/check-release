@@ -1,7 +1,7 @@
 # Check Release
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)](https://dotnet.microsoft.com/download/dotnet/10.0)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue)](https://github.com/SkywardApps/check-release/releases)
 [![Build Status](https://github.com/SkywardApps/check-release/actions/workflows/build.yml/badge.svg)](https://github.com/SkywardApps/check-release/actions/workflows/build.yml)
 [![Release Status](https://github.com/SkywardApps/check-release/actions/workflows/release.yml/badge.svg)](https://github.com/SkywardApps/check-release/actions/workflows/release.yml)
@@ -14,7 +14,7 @@ Created by [Nicholas Elliott](https://nicholasmtelliott.com) at Skyward App Comp
 
 Check Release is a command-line utility that analyzes commits between Git tags or specific commits, extracts JIRA tickets from commit messages, and outputs the results in plain text or HTML format. The HTML output includes meta tags for Slack unfurling, allowing changes to be visible directly in Slack without requiring users to click through to the page.
 
-Originally developed as a bash script, Check Release has been ported to C# using .NET 9 and LibGit2Sharp, providing cross-platform compatibility and additional features.
+Originally developed as a bash script, Check Release has been ported to C# using .NET and LibGit2Sharp (currently targeting .NET 10), providing cross-platform compatibility and additional features.
 
 ## Features
 
@@ -37,7 +37,7 @@ Download the latest release for your platform from the [Releases](https://github
 
 ### Building from Source
 
-1. Ensure you have [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) installed
+1. Ensure you have [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) installed
 2. Clone the repository:
    ```
    git clone https://github.com/SkywardApps/check-release.git

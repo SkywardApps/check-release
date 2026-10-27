@@ -6,7 +6,7 @@ Thank you for your interest in contributing to Check Release! We welcome contrib
 
 ### Development Environment Setup
 
-1. Ensure you have [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) installed
+1. Ensure you have [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) installed
 2. Clone the repository:
    ```
    git clone https://github.com/SkywardApps/check-release.git
