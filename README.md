@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)](https://dotnet.microsoft.com/download/dotnet/10.0)
-[![Version](https://img.shields.io/badge/Version-1.0.0-blue)](https://github.com/SkywardApps/check-release/releases)
+[![Version](https://img.shields.io/github/v/release/SkywardApps/check-release?label=version)](https://github.com/SkywardApps/check-release/releases/latest)
 [![Build Status](https://github.com/SkywardApps/check-release/actions/workflows/build.yml/badge.svg)](https://github.com/SkywardApps/check-release/actions/workflows/build.yml)
 [![Release Status](https://github.com/SkywardApps/check-release/actions/workflows/release.yml/badge.svg)](https://github.com/SkywardApps/check-release/actions/workflows/release.yml)
 
